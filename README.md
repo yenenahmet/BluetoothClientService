@@ -6,17 +6,17 @@ Android lib for working with Bluetooth Client and Bluetooth Scan in Android Sdk
 
 
 
- private BSS bluetoohSock;
+      private BSS bluetoohSock;
  
  
 
- @Override
-    protected void onStart() {
-        super.onStart();
-        BluetoohSock(device);
+     @Override
+      protected void onStart() {
+         super.onStart();
+         BluetoohSock(device);
 
-    }
-private void BluetoohSock(BluetoothDevice device){
+      }
+     private void BluetoohSock(BluetoothDevice device){
        bluetoohSock = new BSS(device,true,true,this,false);
        bluetoohSock.setBSSListener(new BSS.BSSListener() {
            @Override
@@ -34,8 +34,8 @@ private void BluetoohSock(BluetoothDevice device){
 
            }
        });
-   }
+      }
    
-    private void SendCommandBluetooth(String Send){
+      private void SendCommandBluetooth(String Send){
         bluetoohSock.SendMessage(Send);
-    }
+      }
