@@ -51,7 +51,7 @@ Android lib for working with Bluetooth Client and Bluetooth Scan in Android Sdk
                   bluetoothScan.getProgressDialog().setOnCancelListener(new DialogInterface.OnCancelListener() {
                       @Override
                       public void onCancel(DialogInterface dialog) {
-                          if(bluetoothScan.getBulundumu()){
+                          if(bluetoothScan.isDevice()){
                               device = bluetoothScan.getBluetoothDevice();
                           }
                       }
