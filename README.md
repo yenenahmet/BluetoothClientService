@@ -17,7 +17,7 @@ Android lib for working with Bluetooth Client and Bluetooth Scan in Android Sdk
 
       }
      private void BluetoohSock(BluetoothDevice device){
-       bluetoohSock = new BSS(device,true,true,this,false,false);
+       bluetoohSock = new BSS(device,this,true,true,false,false);
        bluetoohSock.setBSSListener(new BSS.BSSListener() {
            @Override
            public void onStateChange(String Status, int StatusCode) {
