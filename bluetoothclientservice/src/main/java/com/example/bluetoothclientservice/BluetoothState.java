@@ -29,9 +29,9 @@ public class BluetoothState {
     public static final boolean DEVICE_OTHER = false;
 
     //UUID
-    public static final UUID uuid = UUID.fromString("00001101-0000-1000-8000-00805F9B34FB");
-    public static final UUID MY_UUID_SECURE = UUID.fromString("fa87c0d0-afac-11de-8a39-0800200c9a66");
-    public static final UUID MY_UUID_INSECURE = UUID.fromString("8ce255c0-200a-11e0-ac64-0800200c9a66");
+    public static final UUID uuid_HC05 = UUID.fromString("00001101-0000-1000-8000-00805F9B34FB");
+    public static final UUID UUID_SECURE_Android = UUID.fromString("fa87c0d0-afac-11de-8a39-0800200c9a66");
+    public static final UUID UUID_INSECURE_Android = UUID.fromString("8ce255c0-200a-11e0-ac64-0800200c9a66");
 
     public static ProgressDialog ProgressRun (Context context, String veri){
         ProgressDialog progressDialog = new ProgressDialog(context);

@@ -10,6 +10,7 @@ import android.util.Log;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.util.UUID;
 
 /**
  * Created by Ahmet on 18.09.2017.
@@ -21,11 +22,13 @@ public class BluetoothClientService {
     private Connected connected;
     private int State =0;
     private Handler mHandler;
-    private boolean  SecureConnect;
-    public  BluetoothClientService(BluetoothDevice bluetoothDevice,Handler mHandler,boolean SecureConnect){
+    private boolean  SecureConnect,isDevice;
+    private String TAG ="BluetoothClientService";
+    public  BluetoothClientService(BluetoothDevice bluetoothDevice,Handler mHandler,boolean SecureConnect,boolean isDevice){
         this.device = bluetoothDevice;
         this.mHandler= mHandler;
         this.SecureConnect = SecureConnect;
+        this.isDevice = isDevice;
     }
     private synchronized void setState(int state) {
         this.State = state;
@@ -58,7 +61,10 @@ public class BluetoothClientService {
     public void SendMessage(String command)  {
         Connected r;
         synchronized (this){
-            if(State ==0) return;
+            if(State ==0){
+                mHandler.obtainMessage(BluetoothState.MESSAGE_TOAST,"Send Message Error , Not Connect").sendToTarget();
+                return;
+            }
             r = connected;
         }
         r.Write(command);
@@ -69,9 +75,17 @@ public class BluetoothClientService {
             try{
                 BluetoothSocket socket = null;
                 if(SecureConnect){
-                    socket = device.createRfcommSocketToServiceRecord(BluetoothState.uuid);
+                    if(isDevice){
+                        socket = device.createRfcommSocketToServiceRecord(BluetoothState.UUID_SECURE_Android);
+                    }else{
+                        socket = device.createRfcommSocketToServiceRecord(BluetoothState.uuid_HC05);
+                    }
                 }else{
-                    socket = device.createInsecureRfcommSocketToServiceRecord(BluetoothState.uuid);
+                    if(isDevice){
+                        socket = device.createInsecureRfcommSocketToServiceRecord(BluetoothState.UUID_INSECURE_Android);
+                    }else {
+                        socket = device.createInsecureRfcommSocketToServiceRecord(BluetoothState.uuid_HC05);
+                    }
                 }
                 mmSocket = socket;
                 setState(2);
@@ -80,8 +94,6 @@ public class BluetoothClientService {
                 mHandler.obtainMessage(BluetoothState.MESSAGE_TOAST,"Not Connect. ERROR ").sendToTarget();
                 return;
             }
-
-
         }
         @Override
         public void run() {
@@ -94,7 +106,7 @@ public class BluetoothClientService {
                 Log.e("Hata Düştü Client",e.toString());
                 SocketClose();
                 setState(0);
-                mHandler.obtainMessage(BluetoothState.MESSAGE_TOAST,"Device connection was lost").sendToTarget();
+                mHandler.obtainMessage(BluetoothState.MESSAGE_TOAST,"Not Connect  RUN. ERROR").sendToTarget();
                 return;
             }
         }
@@ -102,7 +114,7 @@ public class BluetoothClientService {
             try {
                 mmSocket.close();
             } catch (IOException closeException) {
-                Log.e("Socket Close Bom", closeException.toString());
+                Log.e(TAG, closeException.toString());
             }
 
         }
@@ -121,7 +133,7 @@ public class BluetoothClientService {
                 setState(3);
             }catch (IOException ex){
                 setState(0);
-                mHandler.obtainMessage(BluetoothState.MESSAGE_TOAST,"Not Connected.Input Output ERROR ").sendToTarget();
+                mHandler.obtainMessage(BluetoothState.MESSAGE_TOAST,"Not Connected.Input Output . ERROR ").sendToTarget();
                 return;
             }
 
@@ -134,8 +146,8 @@ public class BluetoothClientService {
                    // DataStringEdit();
                 }catch (IOException ex){
                     SocketClose();
-                    Log.e("Connected BAM",ex.toString());
-                    mHandler.obtainMessage(BluetoothState.MESSAGE_TOAST,"Device connection was lost");
+                    Log.e(TAG,ex.toString());
+                    mHandler.obtainMessage(BluetoothState.MESSAGE_TOAST,"Not Connected.Input Output  READ . ERROR").sendToTarget();
                     break;
                 }
             }
@@ -145,7 +157,7 @@ public class BluetoothClientService {
                 out.write((command+"\r").getBytes());
                 mHandler.obtainMessage(BluetoothState.MESSAGE_WRITE,-1,-1,command).sendToTarget();
             }catch (IOException ex){
-                mHandler.obtainMessage(BluetoothState.MESSAGE_TOAST,"Error Send Message");
+                mHandler.obtainMessage(BluetoothState.MESSAGE_TOAST,"Error Send Message").sendToTarget();
             }
         }
         private void DataCharEdit() throws IOException {// Bluetooth Socket Fast  Read
@@ -169,7 +181,7 @@ public class BluetoothClientService {
             try {
                 socket.close();
             } catch (IOException e) {
-                Log.e("Bammmmmmm", "close() of connect socket failed", e);
+                Log.e(TAG, e.toString());
             }
         }
     }

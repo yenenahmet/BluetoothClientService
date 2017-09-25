@@ -24,24 +24,21 @@ public class BSS {
             switch (msg.what) {
                 case BluetoothState.MESSAGE_WRITE:
                     SendMessage = msg.obj.toString();
-                    Log.e("Mhandler Write Send= ",msg.obj.toString());
+                    Log.e(TAG +"Write ",msg.obj.toString());
                     break;
                 case BluetoothState.MESSAGE_READ:
                     String readMessage = new String((byte[]) msg.obj);
                     readMessage = ClearData(readMessage);
                     SendMessage = ClearData(SendMessage);
-                    if(readMessage != null && !SendMessage.equals(readMessage)) {
+                    if(readMessage != null && !SendMessage.equals(readMessage) && readMessage != "") {
                         bssListener.onMessage(readMessage);
-                        Log.e("MainActivity Read",readMessage);
-                    }else{
-                        Log.e("MainActivity Read","BAM");
                     }
                     break;
                 case BluetoothState.MESSAGE_DEVICE_NAME:
                     break;
                 case BluetoothState.MESSAGE_TOAST:
                     bssListener.onError(msg.obj.toString());
-                    Log.e("MainActivity TOAST",msg.obj.toString());
+                    Log.e(TAG+" TOAST ",msg.obj.toString());
                     break;
                 case BluetoothState.MESSAGE_STATE_CHANGE:
                     switch (msg.arg1){
@@ -67,24 +64,26 @@ public class BSS {
             }
         }
     };
-    public BSS(@NonNull BluetoothDevice device, boolean AutoStart, boolean AutoProgress,@NonNull Context context, boolean SecureConnect){
+    public BSS(@NonNull BluetoothDevice device,@NonNull Context context,@NonNull boolean AutoStart,@NonNull boolean AutoProgress,@NonNull boolean SecureConnect,@NonNull boolean isDevice){
+        bluetoothClientService = new BluetoothClientService(device,mHandler,SecureConnect,isDevice);
         this.context = context;
-        bluetoothClientService = new BluetoothClientService(device,mHandler,SecureConnect);
         if(AutoStart){
             Connect();
         }
         if(AutoProgress){
             progressDialog = BluetoothState.ProgressRun(context,"Connecting to Device ...");
         }
-
     }
 
     public void Connect(){
          bluetoothClientService.Connect();
     }
     public void SendMessage(String Message){
-  bluetoothClientService.SendMessage(Message);
- }
+        if(Message == null){
+            return;
+        }
+        bluetoothClientService.SendMessage(Message);
+    }
     public void StopService(){
      bluetoothClientService.stop();
  }

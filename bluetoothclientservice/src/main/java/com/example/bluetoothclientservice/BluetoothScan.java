@@ -20,7 +20,7 @@ public class BluetoothScan {
     private static final String TAG ="BluetoothScan";
     private BluetoothDevice bluetoothDevice;
     private ProgressDialog progressDialog ;
-    private Boolean Bulundumu = false;
+    private Boolean isDevice = false;
     private ArrayList<BluetoothDevice> devicesList = new ArrayList<>();
     private Context context;
     private String SearchMac;
@@ -30,8 +30,7 @@ public class BluetoothScan {
         this.SearchMac = SearchMac;
 
     }
-
-    public  boolean BluetoothAdapterKontrol(){
+    public  boolean BluetoothAdapterControl(){
         progressDialog = BluetoothState.ProgressRun(context,"SEARCH Device...");
         if(BluetoothAdapter.getDefaultAdapter() != null) {
             if(!BluetoothAdapter.getDefaultAdapter().isEnabled()) {
@@ -51,7 +50,6 @@ public class BluetoothScan {
         public void onReceive(Context context, Intent intent) {
             String action = intent.getAction();
             if(BluetoothDevice.ACTION_FOUND.equals(action)) {
-                Log.e("listen","Action");
                 BluetoothDevice btDevice = intent.getParcelableExtra(BluetoothDevice.EXTRA_DEVICE);
                 devicesList.add(btDevice);
                 if(devicesList.size() >0){
@@ -59,12 +57,13 @@ public class BluetoothScan {
                         Log.e(TAG,device.toString() +"," + device.getName());
                         if(device.getAddress().toString().trim().equals(SearchMac)){
                             bluetoothDevice = device;
-                            Bulundumu =true;
+                            isDevice =true;
                         }
                     }
                 }
-                if(Bulundumu){
-                    DeviceBulundu();
+                if(isDevice){
+                    progressDialog.cancel();
+                    BluetoothAdapter.getDefaultAdapter().cancelDiscovery();
                 }
             }
         }
@@ -80,10 +79,7 @@ public class BluetoothScan {
         Log.e(TAG, "Starting discovery...");
         BluetoothAdapter.getDefaultAdapter().startDiscovery();
     }
-    private void DeviceBulundu(){
-        progressDialog.cancel();
-        BluetoothAdapter.getDefaultAdapter().cancelDiscovery();
-    }
+
     public void StopReceiver(){
         context.unregisterReceiver(mReceiver);
     }
@@ -93,8 +89,8 @@ public class BluetoothScan {
     public ProgressDialog getProgressDialog(){
         return progressDialog;
     }
-    public boolean getBulundumu(){
-        return (Bulundumu);
+    public boolean isDevice(){
+        return isDevice;
     }
     public BluetoothDevice getBluetoothDeviceList(){
         return bluetoothDevice;
