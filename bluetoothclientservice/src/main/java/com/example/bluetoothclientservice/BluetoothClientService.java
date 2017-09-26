@@ -30,8 +30,8 @@ public class BluetoothClientService {
         this.SecureConnect = SecureConnect;
         this.isDevice = isDevice;
     }
-    public int getState(){
-       return State;
+     public synchronized int getState(){
+        return this.State;
     }
     private synchronized void setState(int state) {
         this.State = state;
@@ -182,7 +182,18 @@ public class BluetoothClientService {
         }
         public void SocketClose() {
             try {
+                ResetCommand();
+                in.close();
+                out.close();
                 socket.close();
+            } catch (IOException e) {
+                Log.e(TAG, e.toString());
+            }
+        }
+         private void ResetCommand(){
+            try {
+                out.write(("\r").getBytes());
+                out.flush();
             } catch (IOException e) {
                 Log.e(TAG, e.toString());
             }
