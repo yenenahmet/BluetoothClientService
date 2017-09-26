@@ -30,6 +30,9 @@ public class BluetoothClientService {
         this.SecureConnect = SecureConnect;
         this.isDevice = isDevice;
     }
+    public int getState(){
+       return State;
+    }
     private synchronized void setState(int state) {
         this.State = state;
         this.mHandler.obtainMessage(1, state, -1).sendToTarget();
@@ -45,7 +48,7 @@ public class BluetoothClientService {
         }
         setState(1);
         this.connect = new Connect();
-        this.connect.run();
+        this.connect.start();
 }
     public synchronized void stop() {
         if (this.connect != null) {
@@ -101,7 +104,7 @@ public class BluetoothClientService {
             try {
                 mmSocket.connect();
                 connected = new Connected(mmSocket);
-                connected.run();
+                connected.start();
             } catch (IOException e) {
                 Log.e("Hata Düştü Client",e.toString());
                 SocketClose();
