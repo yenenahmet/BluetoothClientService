@@ -37,6 +37,9 @@ public class BSS {
                 case BluetoothState.MESSAGE_DEVICE_NAME:
                     break;
                 case BluetoothState.MESSAGE_TOAST:
+                     if(progressDialog.isShowing() && progressDialog != null){
+                        progressDialog.cancel();
+                     }
                     bssListener.onError(msg.obj.toString());
                     Log.e(TAG+" TOAST ",msg.obj.toString());
                     break;
@@ -74,10 +77,17 @@ public class BSS {
             progressDialog = BluetoothState.ProgressRun(context,"Connecting to Device ...");
         }
     }
-
+    
+    public BSS(@NonNull BluetoothDevice device,@NonNull boolean SecureConnect,@NonNull boolean isDevice){
+        bluetoothClientService = new BluetoothClientService(device,mHandler,SecureConnect,isDevice);
+    }
+    
     public void Connect(){
-        
-         bluetoothClientService.Connect();
+            if(bluetoothClientService.getState() ==0){
+                bluetoothClientService.Connect();
+            }else{
+                bssListener.onError("Connected on Device");
+            }
     }
     public void SendMessage(String Message){
         if(Message == null){
@@ -96,8 +106,14 @@ public class BSS {
     public void setBSSListener(BSSListener bssListener){
         this.bssListener = bssListener;
     }
-    public ProgressDialog getProgressDialog(){
-       return progressDialog;
+    public void Restart(){
+        StopService();
+        try{
+            Thread.sleep(99);
+            Connect();
+        }catch (InterruptedException ex){
+            Log.e(TAG +"Restart",ex.toString());
+        }
     }
     private String ClearData(String Data){
         String Clear = Data.replace("\r","");
