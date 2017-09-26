@@ -100,7 +100,7 @@ public class BluetoothClientService {
         }
         @Override
         public void run() {
-            BluetoothAdapter.getDefaultAdapter().cancelDiscovery();
+            
             try {
                 mmSocket.connect();
                 connected = new Connected(mmSocket);
