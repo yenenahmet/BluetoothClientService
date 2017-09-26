@@ -27,7 +27,7 @@ public class BSS {
                     Log.e(TAG +"Write ",msg.obj.toString());
                     break;
                 case BluetoothState.MESSAGE_READ:
-                    String readMessage = new String((byte[]) msg.obj);
+                    String readMessage = ( String) msg.obj;
                     readMessage = ClearData(readMessage);
                     SendMessage = ClearData(SendMessage);
                     if(readMessage != null && !SendMessage.equals(readMessage) && readMessage != "") {
@@ -76,6 +76,7 @@ public class BSS {
     }
 
     public void Connect(){
+        
          bluetoothClientService.Connect();
     }
     public void SendMessage(String Message){
